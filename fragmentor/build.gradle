@@ -1,0 +1,72 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+configurations {
+    ktlint
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation deps.android.support.compat
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    ktlint deps.kotlin.lint
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xno-param-assertions']
+        allWarningsAsErrors = true
+    }
+}
+
+task ktlint(type: JavaExec, group: LifecycleBasePlugin.VERIFICATION_GROUP) {
+    inputs.dir('src')
+    outputs.dir('src')
+
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = 'com.github.shyiko.ktlint.Main'
+    args '--android', 'src/**/*.kt'
+}
+check.dependsOn ktlint
+
+task ktFormat(type: JavaExec, group: 'formatting') {
+    inputs.dir('src')
+    outputs.dir('src')
+
+    description = 'Fix Kotlin code style deviations.'
+    classpath = configurations.ktlint
+    main = 'com.github.shyiko.ktlint.Main'
+    args '--android', '-F', 'src/**/*.kt'
+}
+

@@ -1,0 +1,23 @@
+ext.deps = [
+    android: [
+      support: [
+          compat: "com.android.support:appcompat-v7:27.1.0",
+          constraitLayout: "com.android.support.constraint:constraint-layout:1.0.2"
+      ],
+      test: [
+          junit: "junit:junit:4.12",
+          runner: "com.android.support.test:runner:1.0.1",
+          expressoCore: "com.android.support.test.espresso:espresso-core:3.0.1"
+      ]
+    ],
+    kotlin: [
+       stdlibJdk7: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.21",
+       reflect: "org.jetbrains.kotlin:kotlin-reflect:1.2.21",
+	   lint: 'com.github.shyiko:ktlint:0.20.0'
+    ]
+]
+
+ext.versions = [
+    minSdk: 14,
+    compileSdk: 27
+]

@@ -1,0 +1,26 @@
+buildscript {
+    ext.kotlinPluginVersion = '1.2.30'
+    ext.gradlePluginVersion = '3.0.1'
+    
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinPluginVersion"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+apply from: 'deps.gradle'
