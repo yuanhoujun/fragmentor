@@ -10,12 +10,19 @@ android {
         versionCode 1
         versionName "1.0"
 
+        testApplicationId "com.youngfeng.fragmentortest"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        main.res.srcDirs += 'src/androidTest/res'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+    }
+
+    lintOptions {
+        checkTestSources true
+        ignoreWarnings true
     }
 
     buildTypes {
@@ -35,8 +42,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation deps.android.support.compat
+    implementation deps.kotlin.reflect
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation "com.android.support.test:rules:1.0.1"
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     ktlint deps.kotlin.lint
@@ -45,7 +55,7 @@ dependencies {
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs = ['-Xno-param-assertions']
-        allWarningsAsErrors = true
+//        allWarningsAsErrors = true
     }
 }
 
