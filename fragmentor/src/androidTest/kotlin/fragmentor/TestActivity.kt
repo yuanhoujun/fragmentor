@@ -1,14 +1,14 @@
 package fragmentor
 
 import android.os.Bundle
-import fragmentor.app.SupportActivity
+import fragmentor.app.FragmentorActivity
 
 /**
  * TestActivity
  *
  * @author Scott Smith 2018-03-23 11:18
  */
-class TestActivity: SupportActivity() {
+class TestActivity: FragmentorActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

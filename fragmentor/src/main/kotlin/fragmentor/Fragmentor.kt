@@ -1,8 +1,17 @@
 package fragmentor
 
-class Fragmentor {
-    fun f(): Int {
+import android.annotation.SuppressLint
+import android.content.Context
 
-        return 0
+@SuppressLint("StaticFieldLeak")
+object Fragmentor {
+    private lateinit var applictionContext: Context
+    var debug: Boolean = false
+    private var isInitialized = false
+
+    fun init(applictionContext: Context, debug: Boolean = false) {
+        this.applictionContext = applictionContext
+        this.debug = debug
+        isInitialized = true
     }
 }

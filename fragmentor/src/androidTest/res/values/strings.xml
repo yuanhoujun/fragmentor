@@ -1,3 +1,7 @@
 <resources>
     <string name="the_first_fragment">The first Fragment.</string>
+    <string name="the_second_fragment">The second Fragment.</string>
+    <string name="the_third_fragment">The third Fragment</string>
+    <string name="go_to_second_fragment">Go to second Fragment</string>
+    <string name="go_to_third_fragment">Go to third Fragment</string>
 </resources>

@@ -1,6 +1,7 @@
 package fragmentor.app
 
 import android.util.Pair
+import fragmentor.animation.TransitionAnimator
 import kotlin.reflect.KClass
 
 /**
@@ -9,7 +10,12 @@ import kotlin.reflect.KClass
  * @author Scott Smith 2018-03-22 21:24
  */
 interface FragmentControl {
-    fun push(fragmentCls: KClass<in SupportFragment>, vararg params: Pair<String, Any>)
+    fun push(fragmentCls: KClass<out SupportFragment>,
+        vararg params: Pair<String, Any>,
+        addToBackStack: Boolean = true,
+        activeTransitionAnimator: TransitionAnimator? = null,
+        passiveTransitionAnimator: TransitionAnimator? = null)
+
     fun push(fragment: SupportFragment, vararg params: Pair<String, Any>)
 
     fun pop()
