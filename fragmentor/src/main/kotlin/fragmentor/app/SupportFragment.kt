@@ -11,6 +11,7 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import fragmentor.R
 import fragmentor.animation.TransitionAnimator
+import fragmentor.animation.TransitionAnimatorStatus
 import fragmentor.animation.TransitionAnimatorType
 import fragmentor.widget.FragmentorRootLayout
 import kotlin.reflect.KClass
@@ -23,6 +24,7 @@ import kotlin.reflect.KClass
 open class SupportFragment : Fragment(), FragmentControl {
     private var mActiveTransitionAnimator: TransitionAnimator? = null
     private var mPassiveTransitionAnimator: TransitionAnimator? = null
+    private var mTransitionAnimatorStatus = TransitionAnimatorStatus()
 
     final override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         return null
@@ -55,7 +57,30 @@ open class SupportFragment : Fragment(), FragmentControl {
     }
 
     open fun onCreateAnimator(transit: Int, nextAnimatorType: TransitionAnimatorType?, nextAnimator: Animator?): Animator? {
-        return nextAnimator
+        var nextAnimatorFinal = nextAnimator
+        when (nextAnimatorType) {
+            TransitionAnimatorType.ENTER -> {
+                if (mTransitionAnimatorStatus.enterCanceled) {
+                    nextAnimatorFinal = null
+                }
+            }
+            TransitionAnimatorType.EXIT -> {
+                if (mTransitionAnimatorStatus.exitCanceled) {
+                    nextAnimatorFinal = null
+                }
+            }
+            TransitionAnimatorType.POP_ENTER -> {
+                if (mTransitionAnimatorStatus.popEnterCanceled) {
+                    nextAnimatorFinal = null
+                }
+            }
+            TransitionAnimatorType.POP_EXIT -> {
+                if (mTransitionAnimatorStatus.popExitCanceled) {
+                    nextAnimatorFinal = null
+                }
+            }
+        }
+        return nextAnimatorFinal
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -107,6 +132,28 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     fun setPassiveTransitionAnimator(passiveTransitionAnimator: TransitionAnimator?) {
         mPassiveTransitionAnimator = passiveTransitionAnimator
+    }
+
+    fun cancelTransitionAnimator(vararg types: TransitionAnimatorType) {
+        types.forEach {
+            when (it) {
+                TransitionAnimatorType.ENTER -> mTransitionAnimatorStatus.enterCanceled = true
+                TransitionAnimatorType.EXIT -> mTransitionAnimatorStatus.exitCanceled = true
+                TransitionAnimatorType.POP_ENTER -> mTransitionAnimatorStatus.popEnterCanceled = true
+                TransitionAnimatorType.POP_EXIT -> mTransitionAnimatorStatus.popExitCanceled = true
+            }
+        }
+    }
+
+    fun resumeTransitionAnimator(vararg types: TransitionAnimatorType) {
+        types.forEach {
+            when (it) {
+                TransitionAnimatorType.ENTER -> mTransitionAnimatorStatus.enterCanceled = false
+                TransitionAnimatorType.EXIT -> mTransitionAnimatorStatus.exitCanceled = false
+                TransitionAnimatorType.POP_ENTER -> mTransitionAnimatorStatus.popEnterCanceled = false
+                TransitionAnimatorType.POP_EXIT -> mTransitionAnimatorStatus.popExitCanceled = false
+            }
+        }
     }
 
     override fun push(fragmentCls: KClass<out SupportFragment>,
