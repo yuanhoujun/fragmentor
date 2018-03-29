@@ -1,6 +1,5 @@
 package fragmentor.app
 
-import android.util.Pair
 import fragmentor.animation.TransitionAnimator
 import kotlin.reflect.KClass
 

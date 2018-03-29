@@ -85,6 +85,10 @@ open class FragmentorActivity : AppCompatActivity() {
                 if (null != targetFragment) {
                     targetFragment.setActiveTransitionAnimator(activeTransitionAnimator)
                     targetFragment.setPassiveTransitionAnimator(passiveTransitionAnimator)
+                    // Put params to target fragment
+                    params.forEach {
+                        targetFragment.putParameter(it.first, it.second)
+                    }
                     transaction.add(fragmentContainerId(), targetFragment, fragmentCls.qualifiedName)
                     if (addToBackStack) {
                         transaction.addToBackStack(fragmentCls.qualifiedName)

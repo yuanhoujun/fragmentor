@@ -3,7 +3,6 @@ package fragmentor.app
 import android.animation.Animator
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +24,7 @@ open class SupportFragment : Fragment(), FragmentControl {
     private var mActiveTransitionAnimator: TransitionAnimator? = null
     private var mPassiveTransitionAnimator: TransitionAnimator? = null
     private var mTransitionAnimatorStatus = TransitionAnimatorStatus()
+    private var mParameters = HashMap<String, Any>()
 
     final override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         return null
@@ -156,6 +156,14 @@ open class SupportFragment : Fragment(), FragmentControl {
         }
     }
 
+    fun putParameter(key: String, value: Any) {
+        mParameters[key] = value
+    }
+
+    fun <T> parameter(key: String): T? {
+        return mParameters[key] as? T
+    }
+
     override fun push(fragmentCls: KClass<out SupportFragment>,
         vararg params: Pair<String, Any>,
         addToBackStack: Boolean,
@@ -163,6 +171,7 @@ open class SupportFragment : Fragment(), FragmentControl {
         passiveTransitionAnimator: TransitionAnimator?) {
         val activity = requireActivity()
         (activity as? FragmentorActivity)?.pushToFragment(fragmentCls = fragmentCls,
+            params = *params,
             addToBackStack = addToBackStack,
             activeTransitionAnimator = activeTransitionAnimator,
             passiveTransitionAnimator = passiveTransitionAnimator)
@@ -178,5 +187,9 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     override fun popToFragment(fragmentCls: KClass<in SupportFragment>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun isDestoryed(): Boolean {
+        return isDetached || isRemoving || null == view || null == view?.parent || null == activity
     }
 }
