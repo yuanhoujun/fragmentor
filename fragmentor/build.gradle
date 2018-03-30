@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.dokka-android'
 
 android {
     compileSdkVersion versions.compileSdk
@@ -78,5 +79,15 @@ task ktFormat(type: JavaExec, group: 'formatting') {
     classpath = configurations.ktlint
     main = 'com.github.shyiko.ktlint.Main'
     args '--android', '-F', 'src/**/*.kt'
+}
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/documentation"
+}
+
+task dokkaJar(type: Jar, dependsOn: dokka) {
+    classifier = 'javadoc'
+    from dokka.outputDirectory
 }
 

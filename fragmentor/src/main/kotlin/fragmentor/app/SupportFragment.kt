@@ -1,6 +1,7 @@
 package fragmentor.app
 
 import android.animation.Animator
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -25,6 +26,22 @@ open class SupportFragment : Fragment(), FragmentControl {
     private var mPassiveTransitionAnimator: TransitionAnimator? = null
     private var mTransitionAnimatorStatus = TransitionAnimatorStatus()
     private var mParameters = HashMap<String, Any>()
+    private var mDelegates = ArrayList<SupportFragmentDelegate>()
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        mDelegates.forEach { it.onAttach(context) }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mDelegates.forEach { it.onCreate(savedInstanceState) }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mDelegates.forEach { it.onViewCreated(view, savedInstanceState) }
+    }
 
     final override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
         return null
@@ -83,12 +100,43 @@ open class SupportFragment : Fragment(), FragmentControl {
         return nextAnimatorFinal
     }
 
+    fun setActiveTransitionAnimator(activeTransitionAnimator: TransitionAnimator?) {
+        mActiveTransitionAnimator = activeTransitionAnimator
+    }
+
+    fun setPassiveTransitionAnimator(passiveTransitionAnimator: TransitionAnimator?) {
+        mPassiveTransitionAnimator = passiveTransitionAnimator
+    }
+
+    fun cancelTransitionAnimator(vararg types: TransitionAnimatorType) {
+        types.forEach {
+            when (it) {
+                TransitionAnimatorType.ENTER -> mTransitionAnimatorStatus.enterCanceled = true
+                TransitionAnimatorType.EXIT -> mTransitionAnimatorStatus.exitCanceled = true
+                TransitionAnimatorType.POP_ENTER -> mTransitionAnimatorStatus.popEnterCanceled = true
+                TransitionAnimatorType.POP_EXIT -> mTransitionAnimatorStatus.popExitCanceled = true
+            }
+        }
+    }
+
+    fun resumeTransitionAnimator(vararg types: TransitionAnimatorType) {
+        types.forEach {
+            when (it) {
+                TransitionAnimatorType.ENTER -> mTransitionAnimatorStatus.enterCanceled = false
+                TransitionAnimatorType.EXIT -> mTransitionAnimatorStatus.exitCanceled = false
+                TransitionAnimatorType.POP_ENTER -> mTransitionAnimatorStatus.popEnterCanceled = false
+                TransitionAnimatorType.POP_EXIT -> mTransitionAnimatorStatus.popExitCanceled = false
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        mDelegates.forEach { it.onActivityCreated(savedInstanceState) }
 
         val rootView = FragmentorRootLayout(activity!!)
         rootView.id = R.id.fragmentor_root_view
@@ -126,34 +174,20 @@ open class SupportFragment : Fragment(), FragmentControl {
         }
     }
 
-    fun setActiveTransitionAnimator(activeTransitionAnimator: TransitionAnimator?) {
-        mActiveTransitionAnimator = activeTransitionAnimator
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        mDelegates.forEach { it.onViewStateRestored(savedInstanceState) }
     }
 
-    fun setPassiveTransitionAnimator(passiveTransitionAnimator: TransitionAnimator?) {
-        mPassiveTransitionAnimator = passiveTransitionAnimator
-    }
-
-    fun cancelTransitionAnimator(vararg types: TransitionAnimatorType) {
-        types.forEach {
-            when (it) {
-                TransitionAnimatorType.ENTER -> mTransitionAnimatorStatus.enterCanceled = true
-                TransitionAnimatorType.EXIT -> mTransitionAnimatorStatus.exitCanceled = true
-                TransitionAnimatorType.POP_ENTER -> mTransitionAnimatorStatus.popEnterCanceled = true
-                TransitionAnimatorType.POP_EXIT -> mTransitionAnimatorStatus.popExitCanceled = true
-            }
-        }
-    }
-
-    fun resumeTransitionAnimator(vararg types: TransitionAnimatorType) {
-        types.forEach {
-            when (it) {
-                TransitionAnimatorType.ENTER -> mTransitionAnimatorStatus.enterCanceled = false
-                TransitionAnimatorType.EXIT -> mTransitionAnimatorStatus.exitCanceled = false
-                TransitionAnimatorType.POP_ENTER -> mTransitionAnimatorStatus.popEnterCanceled = false
-                TransitionAnimatorType.POP_EXIT -> mTransitionAnimatorStatus.popExitCanceled = false
-            }
-        }
+    /**
+     * Bind a delegate instance of [SupportFragmentDelegate] to [SupportFragment].
+     *
+     * @param delegate The custom [SupportFragmentDelegate] instance.
+     *
+     * @see [SupportFragmentDelegate]
+     */
+    fun addDelegate(delegate: SupportFragmentDelegate) {
+        mDelegates.add(delegate)
     }
 
     fun putParameter(key: String, value: Any) {
@@ -191,5 +225,46 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     fun isDestoryed(): Boolean {
         return isDetached || isRemoving || null == view || null == view?.parent || null == activity
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mDelegates.forEach { it.onStart() }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        mDelegates.forEach { it.onResume() }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mDelegates.forEach { it.onPause() }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mDelegates.forEach { it.onSaveInstanceState(outState) }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mDelegates.forEach { it.onStop() }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mDelegates.forEach { it.onDestroyView() }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mDelegates.forEach { it.onDestroy() }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        mDelegates.forEach { it.onDetach() }
     }
 }

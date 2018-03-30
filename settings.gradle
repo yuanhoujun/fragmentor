@@ -1,1 +1,1 @@
-include ':sample', ':fragmentor'
+include ':sample', ':fragmentor', ':fragment-annotations'

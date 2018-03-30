@@ -110,6 +110,7 @@
     <option name="modulesWithSuppressedNotConfigured">
       <set>
         <option value="fragmentor" />
+        <option value="sample" />
       </set>
     </option>
   </component>
