@@ -76,8 +76,11 @@ open class FragmentorActivity : AppCompatActivity() {
             }
 
             var targetFragment = fragmentManager.findFragmentByTag(fragmentCls.qualifiedName) as? SupportFragment
-            // TODO it must add more judgement whether the fragment is active
-            if (null != targetFragment) {
+            if (null != targetFragment && !targetFragment.isDestoryed()) {
+                // Put params to target fragment
+                params.forEach {
+                    targetFragment!!.putParameter(it.first, it.second)
+                }
                 transaction.show(targetFragment)
             } else {
                 targetFragment = Fragment.instantiate(this, fragmentCls.qualifiedName) as? SupportFragment
