@@ -1,5 +1,6 @@
 buildscript {
-    ext.kotlinPluginVersion = '1.2.30'
+    ext.gradlePluginVersion = '3.1.1'
+    ext.kotlinPluginVersion = '1.2.31'
     ext.gradlePluginVersion = '3.0.1'
     ext.dokkaPluginVersion = '0.9.16'
 
@@ -8,7 +9,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.0'
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinPluginVersion"
         classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:$dokkaPluginVersion"
 
