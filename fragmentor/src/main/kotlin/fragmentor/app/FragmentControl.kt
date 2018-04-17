@@ -1,6 +1,7 @@
 package fragmentor.app
 
 import fragmentor.animation.TransitionAnimator
+import fragmentor.annotations.LaunchModeValue
 import kotlin.reflect.KClass
 
 /**
@@ -11,6 +12,7 @@ import kotlin.reflect.KClass
 interface FragmentControl {
     fun push(fragmentCls: KClass<out SupportFragment>,
         vararg params: Pair<String, Any>,
+        launchMode: LaunchModeValue = LaunchModeValue.REUSE,
         addToBackStack: Boolean = true,
         activeTransitionAnimator: TransitionAnimator? = null,
         passiveTransitionAnimator: TransitionAnimator? = null)

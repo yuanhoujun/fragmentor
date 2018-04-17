@@ -13,6 +13,7 @@ import fragmentor.R
 import fragmentor.animation.TransitionAnimator
 import fragmentor.animation.TransitionAnimatorStatus
 import fragmentor.animation.TransitionAnimatorType
+import fragmentor.annotations.LaunchModeValue
 import fragmentor.widget.FragmentorRootLayout
 import kotlin.reflect.KClass
 
@@ -200,12 +201,14 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     override fun push(fragmentCls: KClass<out SupportFragment>,
         vararg params: Pair<String, Any>,
+        launchMode: LaunchModeValue,
         addToBackStack: Boolean,
         activeTransitionAnimator: TransitionAnimator?,
         passiveTransitionAnimator: TransitionAnimator?) {
         val activity = requireActivity()
         (activity as? FragmentorActivity)?.pushToFragment(fragmentCls = fragmentCls,
             params = *params,
+            launchMode = launchMode,
             addToBackStack = addToBackStack,
             activeTransitionAnimator = activeTransitionAnimator,
             passiveTransitionAnimator = passiveTransitionAnimator)

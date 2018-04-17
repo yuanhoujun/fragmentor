@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import fragmentor.R
 import fragmentor.animation.TransitionAnimator
+import fragmentor.annotations.LaunchModeValue
 import kotlin.reflect.KClass
 
 /**
@@ -21,6 +22,7 @@ open class FragmentorActivity : AppCompatActivity() {
     private var mCurrentFragmentTag: String? = null
 
     private val KEY_CURRENT_FRAGMENT_TAG = "android:fragmentor:currentFragmentTag"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +40,13 @@ open class FragmentorActivity : AppCompatActivity() {
 
     private fun backStackChanged() {
         supportFragmentManager.addOnBackStackChangedListener {
-            mCurrentFragmentTag = supportFragmentManager.findFragmentById(fragmentContainerId())?.tag
+            val fragments = supportFragmentManager.fragments
+            for (fragment: Fragment in fragments) {
+                if (fragment.isVisible) {
+                    mCurrentFragmentTag = fragment.javaClass.canonicalName
+                    break
+                }
+            }
         }
     }
 
@@ -57,6 +65,7 @@ open class FragmentorActivity : AppCompatActivity() {
 
     fun pushToFragment(fragmentCls: KClass<out SupportFragment>,
         vararg params: Pair<String, Any>,
+        launchMode: LaunchModeValue = LaunchModeValue.REUSE,
         addToBackStack: Boolean = true,
         activeTransitionAnimator: TransitionAnimator? = null,
         passiveTransitionAnimator: TransitionAnimator? = null) {
@@ -76,28 +85,36 @@ open class FragmentorActivity : AppCompatActivity() {
             }
 
             var targetFragment = fragmentManager.findFragmentByTag(fragmentCls.qualifiedName) as? SupportFragment
-            if (null != targetFragment && !targetFragment.isDestoryed()) {
-                // Put params to target fragment
-                params.forEach {
-                    targetFragment!!.putParameter(it.first, it.second)
-                }
-                transaction.show(targetFragment)
+            val needNew = launchMode === LaunchModeValue.ALWAYS_NEW
+            var isInstantiate: Boolean
+
+            if (null != targetFragment && !targetFragment.isDestoryed() && !needNew) {
+                isInstantiate = false
             } else {
                 targetFragment = Fragment.instantiate(this, fragmentCls.qualifiedName) as? SupportFragment
-
-                if (null != targetFragment) {
-                    targetFragment.setActiveTransitionAnimator(activeTransitionAnimator)
-                    targetFragment.setPassiveTransitionAnimator(passiveTransitionAnimator)
-                    // Put params to target fragment
-                    params.forEach {
-                        targetFragment.putParameter(it.first, it.second)
-                    }
-                    transaction.add(fragmentContainerId(), targetFragment, fragmentCls.qualifiedName)
-                    if (addToBackStack) {
-                        transaction.addToBackStack(fragmentCls.qualifiedName)
-                    }
-                }
+                isInstantiate = true
             }
+
+            if (null == targetFragment) {
+                TODO("Throw instantiate fail exception")
+            }
+
+            targetFragment.setActiveTransitionAnimator(activeTransitionAnimator)
+            targetFragment.setPassiveTransitionAnimator(passiveTransitionAnimator)
+            // Put params to target fragment
+            params.forEach {
+                targetFragment!!.putParameter(it.first, it.second)
+            }
+            if (addToBackStack) {
+                transaction.addToBackStack(fragmentCls.qualifiedName)
+            }
+
+            if (isInstantiate) {
+                transaction.add(fragmentContainerId(), targetFragment, fragmentCls.qualifiedName)
+            } else {
+                transaction.show(targetFragment)
+            }
+
             transaction.commitAllowingStateLoss()
 
             // Just for testing
