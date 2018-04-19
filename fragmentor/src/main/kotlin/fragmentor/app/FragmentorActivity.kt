@@ -125,8 +125,8 @@ open class FragmentorActivity : AppCompatActivity() {
         }
     }
 
-    fun popToFragment(fragmentCls: KClass<in SupportFragment>) {
-    }
+    fun popToFragment(fragmentCls: KClass<in SupportFragment>) = supportFragmentManager.popBackStackImmediate(fragmentCls.qualifiedName,
+        FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
     fun popToLastFragment(): Boolean {
         return try {
@@ -135,10 +135,6 @@ open class FragmentorActivity : AppCompatActivity() {
             e.printStackTrace()
             false
         }
-    }
-
-    override fun getSupportFragmentManager(): FragmentManager {
-        return super.getSupportFragmentManager()
     }
 
     open fun fragmentContainerId() = R.id.fragmentor_container
