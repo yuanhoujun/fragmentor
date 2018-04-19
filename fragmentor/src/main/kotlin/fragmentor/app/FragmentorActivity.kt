@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import fragmentor.R
 import fragmentor.animation.TransitionAnimator
 import fragmentor.annotations.LaunchModeValue
+import fragmentor.utils.FragmentorException
 import kotlin.reflect.KClass
 
 /**
@@ -96,7 +97,7 @@ open class FragmentorActivity : AppCompatActivity() {
             }
 
             if (null == targetFragment) {
-                TODO("Throw instantiate fail exception")
+                throw FragmentorException("${fragmentCls.qualifiedName} instantiate fail.")
             }
 
             targetFragment.setActiveTransitionAnimator(activeTransitionAnimator)
