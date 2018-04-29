@@ -226,6 +226,16 @@ open class SupportFragment : Fragment(), FragmentControl {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun remove(fragment: SupportFragment) {
+        val activity = requireActivity()
+        (activity as? FragmentorActivity)?.remove(fragment)
+    }
+
+    override fun <T : SupportFragment> remove(fragmentCls: KClass<T>) {
+        val activity = requireActivity()
+        (activity as? FragmentorActivity)?.remove(fragmentCls)
+    }
+
     fun isDestoryed(): Boolean {
         return isDetached || isRemoving || null == view || null == view?.parent || null == activity
     }

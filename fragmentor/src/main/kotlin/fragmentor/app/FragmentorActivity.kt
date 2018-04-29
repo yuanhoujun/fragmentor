@@ -137,5 +137,23 @@ open class FragmentorActivity : AppCompatActivity() {
         }
     }
 
+    fun remove(fragment: SupportFragment): Boolean {
+        return try {
+            val fragmentManager = supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.remove(fragment)
+            transaction.commitAllowingStateLoss()
+            true
+        } catch (e: IllegalStateException) {
+            false
+        }
+    }
+
+    fun <T: SupportFragment> remove(fragmentCls: KClass<T>): Boolean {
+        val fragmentManager = supportFragmentManager
+        val fragment = fragmentManager.findFragmentByTag(fragmentCls.qualifiedName) as? SupportFragment ?: return false
+        return remove(fragment)
+    }
+
     open fun fragmentContainerId() = R.id.fragmentor_container
 }

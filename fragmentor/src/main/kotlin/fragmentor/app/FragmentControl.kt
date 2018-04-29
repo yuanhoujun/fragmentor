@@ -21,4 +21,8 @@ interface FragmentControl {
 
     fun pop()
     fun popToFragment(fragmentCls: KClass<in SupportFragment>)
+
+    fun remove(fragment: SupportFragment)
+
+    fun <T: SupportFragment> remove(fragmentCls: KClass<T>)
 }
