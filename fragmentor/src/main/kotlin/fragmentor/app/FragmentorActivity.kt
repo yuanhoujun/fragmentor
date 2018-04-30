@@ -61,7 +61,8 @@ open class FragmentorActivity : AppCompatActivity() {
     }
 
     override fun setContentView(view: View?, params: ViewGroup.LayoutParams?) {
-        TODO("Implement later")
+        val lp = params ?: FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        super.setContentView(view, lp)
     }
 
     fun pushToFragment(fragmentCls: KClass<out SupportFragment>,
