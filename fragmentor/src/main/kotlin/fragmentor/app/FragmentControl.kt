@@ -25,4 +25,18 @@ interface FragmentControl {
     fun remove(fragment: SupportFragment)
 
     fun <T: SupportFragment> remove(fragmentCls: KClass<T>)
+
+    /**
+     * Intercept back operation, [onBackPressed] will be called if this method return true.
+     *
+     * @see [onBackPressed]
+     */
+    fun shouldInterceptBackPressed() = false
+
+    /**
+     * It will be called when back pressed if you intercept back event.
+     *
+     * @see [shouldInterceptBackPressed]
+     */
+    fun onBackPressed(activity: FragmentorActivity) = activity.onBackPressed()
 }

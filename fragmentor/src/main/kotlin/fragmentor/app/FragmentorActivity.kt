@@ -156,4 +156,14 @@ open class FragmentorActivity : AppCompatActivity() {
     }
 
     open fun fragmentContainerId() = R.id.fragmentor_container
+
+    override fun onBackPressed() {
+        val fragment = supportFragmentManager.findFragmentByTag(mCurrentFragmentTag) as? SupportFragment
+        val intercepted = fragment?.shouldInterceptBackPressed() ?: false
+        if (intercepted) {
+            fragment?.onBackPressed(this)
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
