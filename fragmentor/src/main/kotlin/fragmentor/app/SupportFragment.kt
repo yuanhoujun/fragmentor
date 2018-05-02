@@ -13,6 +13,7 @@ import fragmentor.R
 import fragmentor.animation.TransitionAnimator
 import fragmentor.animation.TransitionAnimatorStatus
 import fragmentor.animation.TransitionAnimatorType
+import fragmentor.annotations.ForResult
 import fragmentor.annotations.LaunchModeValue
 import fragmentor.widget.FragmentorRootLayout
 import kotlin.reflect.KClass
@@ -28,6 +29,7 @@ open class SupportFragment : Fragment(), FragmentControl {
     private var mTransitionAnimatorStatus = TransitionAnimatorStatus()
     private var mParameters = HashMap<String, Any>()
     private var mDelegates = ArrayList<SupportFragmentDelegate>()
+    var isAddedToBackStack = false
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -36,6 +38,7 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (activity as? FragmentorActivity)?.addFragmentToStack(this)
         mDelegates.forEach { it.onCreate(savedInstanceState) }
     }
 
@@ -219,7 +222,8 @@ open class SupportFragment : Fragment(), FragmentControl {
     }
 
     override fun pop() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val activity = requireActivity() as? FragmentorActivity
+        activity?.popToLastFragment()
     }
 
     override fun popToFragment(fragmentCls: KClass<in SupportFragment>) {
@@ -238,6 +242,28 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     fun isDestoryed(): Boolean {
         return isDetached || isRemoving || null == view || null == view?.parent || null == activity
+    }
+
+    override fun setResultAndComplete(vararg data: Any, popToLast: Boolean) {
+        val activity = requireActivity() as? FragmentorActivity
+        val fragment = activity?.getLastFragment()
+        fragment?.javaClass?.methods?.firstOrNull {
+            containsForResult(it.annotations)
+        }?.invoke(fragment, *data)
+        if (popToLast) fragment?.pop()
+    }
+
+    private fun containsForResult(annotations: Array<Annotation>): Boolean {
+        var containsForResult = false
+
+        for (annotation in annotations) {
+            if (annotation is ForResult) {
+                containsForResult = true
+                break
+            }
+        }
+
+        return containsForResult
     }
 
     override fun onStart() {
@@ -273,6 +299,7 @@ open class SupportFragment : Fragment(), FragmentControl {
 
     override fun onDestroy() {
         super.onDestroy()
+        (activity as? FragmentorActivity)?.removeFragmentFromStack(this)
         mDelegates.forEach { it.onDestroy() }
     }
 

@@ -36,7 +36,18 @@ interface FragmentControl {
     /**
      * It will be called when back pressed if you intercept back event.
      *
+     * @param activity the host activity.
+     *
      * @see [shouldInterceptBackPressed]
      */
     fun onBackPressed(activity: FragmentorActivity) = activity.onBackPressed()
+
+    /**
+     * Set result and pop to last fragment, the method annotated by [fragmentor.annotations.ForResult] will be invoked.
+     * It is a better implementation like [android.app.Activity.startActivityForResult] in SupportFragment.
+     *
+     * @param data corresponds to the parameters of the callback method
+     * @param popToLast true: pop to the last fragment, false: just callback
+     */
+    fun setResultAndComplete(vararg data: Any, popToLast: Boolean = true)
 }

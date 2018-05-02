@@ -21,9 +21,8 @@ import kotlin.reflect.KClass
  */
 open class FragmentorActivity : AppCompatActivity() {
     private var mCurrentFragmentTag: String? = null
-
     private val KEY_CURRENT_FRAGMENT_TAG = "android:fragmentor:currentFragmentTag"
-
+    private val mFragmentStack = mutableListOf<SupportFragment>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +78,7 @@ open class FragmentorActivity : AppCompatActivity() {
             transaction.setCustomAnimations(R.animator.fragmentor_enter_mark, R.animator.fragmentor_exit_mark,
                 R.animator.fragmentor_pop_enter_mark, R.animator.fragmentor_pop_exit_mark)
             if (!TextUtils.isEmpty(mCurrentFragmentTag)) {
-                val currentFragment = fragmentManager.findFragmentByTag(mCurrentFragmentTag)
+                val currentFragment = fragmentManager.findFragmentByTag(mCurrentFragmentTag) as? SupportFragment
 
                 if (null != currentFragment) {
                     transaction.hide(currentFragment)
@@ -101,11 +100,12 @@ open class FragmentorActivity : AppCompatActivity() {
                 throw FragmentorException("${fragmentCls.qualifiedName} instantiate fail.")
             }
 
+            targetFragment.isAddedToBackStack = addToBackStack
             targetFragment.setActiveTransitionAnimator(activeTransitionAnimator)
             targetFragment.setPassiveTransitionAnimator(passiveTransitionAnimator)
             // Put params to target fragment
             params.forEach {
-                targetFragment!!.putParameter(it.first, it.second)
+                targetFragment.putParameter(it.first, it.second)
             }
             if (addToBackStack) {
                 transaction.addToBackStack(fragmentCls.qualifiedName)
@@ -154,6 +154,37 @@ open class FragmentorActivity : AppCompatActivity() {
         val fragmentManager = supportFragmentManager
         val fragment = fragmentManager.findFragmentByTag(fragmentCls.qualifiedName) as? SupportFragment ?: return false
         return remove(fragment)
+    }
+
+    fun addFragmentToStack(fragment: SupportFragment) {
+        if (!mFragmentStack.contains(fragment)) {
+            mFragmentStack.add(0, fragment)
+        }
+    }
+
+    fun removeFragmentFromStack(fragment: SupportFragment) {
+        mFragmentStack.remove(fragment)
+    }
+
+    fun getLastFragment(): SupportFragment? {
+        var targetFragment: SupportFragment? = null
+
+        if (mFragmentStack.size > 1) {
+            var index = 1
+            while (index < mFragmentStack.size) {
+                if (mFragmentStack[index].isAddedToBackStack) {
+                    targetFragment = mFragmentStack[index]
+                    break
+                }
+                index ++
+            }
+
+            if (null == targetFragment && mFragmentStack.size > 1) {
+                targetFragment = mFragmentStack[1]
+            }
+        }
+
+        return targetFragment
     }
 
     open fun fragmentContainerId() = R.id.fragmentor_container
